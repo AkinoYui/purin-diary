@@ -425,16 +425,27 @@
     var gi = document.getElementById("gateInput"),
         gb = document.getElementById("gateBtn"),
         ge = document.getElementById("gateErr");
-    var tryGate = function(){
-      var raw = gi.value, val = raw.trim();
+    var gv = document.getElementById("gateVer");
+    if (gv) gv.textContent = "빌드 5";
+    function calc(){
+      var val = gi.value.trim();
       if (val.normalize) val = val.normalize("NFC");
       var h;
-      try { h = hashPassword(val); }
-      catch(err){ ge.textContent = "오류: " + err.message; return; }
-      if (h === C.gateHash){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
-      else { ge.textContent = "암호가 달라요 (길이 " + val.length + " · " + (h ? h.slice(0,8) : "??") + ")"; gi.focus(); }
+      try { h = hashPassword(val) || ""; } catch(err){ h = "ERR:" + err.message; }
+      return { val: val, h: h, ok: h === C.gateHash };
+    }
+    var diag = function(){
+      var r = calc();
+      if (!r.val){ ge.textContent = ""; return; }
+      ge.textContent = "입력 " + r.val.length + "자 · " + r.h.slice(0,8) + (r.ok ? " · 일치 ✓" : " · 불일치");
+    };
+    var tryGate = function(){
+      var r = calc();
+      if (r.ok){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
+      else { ge.textContent = "암호가 달라요 (입력 " + r.val.length + "자 · " + r.h.slice(0,8) + ")"; gi.focus(); }
     };
     gb.onclick = tryGate;
+    gi.addEventListener("input", diag);
     gi.addEventListener("keydown", function(e){ if (e.key === "Enter") tryGate(); });
     var gs = document.getElementById("gateShow");
     if (gs) gs.addEventListener("change", function(){ gi.type = gs.checked ? "text" : "password"; });

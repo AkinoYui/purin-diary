@@ -38,6 +38,7 @@ body{
 .gate button{width:100%; margin-top:12px; padding:12px; border:none; border-radius:12px;
   background:var(--accent); color:var(--accent-dk); font-family:"Jua",sans-serif; font-size:15px; cursor:pointer;}
 .gate-err{font-size:12px; color:#f6a9c6; margin-top:10px; min-height:16px;}
+.gate-ver{font-size:11px; color:var(--muted); margin-top:8px; opacity:.7;}
 
 /* 화면 전환 */
 .screen{display:none; animation:fade .25s ease;}
