@@ -374,27 +374,65 @@
   function start(){ renderHome(); checkMilestones(); }
   var appEl = document.getElementById("app");
   function unlockApp(){ appEl.classList.remove("pre"); document.getElementById("gate").hidden = true; start(); }
-  function sha256(str){
-    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function(buf){
-      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ("0"+b.toString(16)).slice(-2); }).join("");
-    });
+  // 순수 JS SHA-256 (브라우저 crypto 기능에 의존하지 않음 — 앱 내 브라우저에서도 동작)
+  function utf8Bytes(str){ return unescape(encodeURIComponent(str)); } // 각 문자가 UTF-8 바이트(0-255)
+  function sha256Hex(ascii){
+    function rr(x,n){ return (x>>>n)|(x<<(32-n)); }
+    var maxWord = Math.pow(2,32), result = "", words = [], asciiBitLength = ascii.length*8;
+    var hash = sha256Hex.h = sha256Hex.h || [], k = sha256Hex.k = sha256Hex.k || [];
+    var pc = k.length, comp = {};
+    for (var cand = 2; pc < 64; cand++){
+      if (!comp[cand]){
+        for (var i = 0; i < 313; i += cand){ comp[i] = cand; }
+        hash[pc] = (Math.pow(cand,0.5)*maxWord)|0;
+        k[pc++] = (Math.pow(cand,1/3)*maxWord)|0;
+      }
+    }
+    ascii += "\x80";
+    while (ascii.length % 64 - 56) ascii += "\x00";
+    for (var i = 0; i < ascii.length; i++){
+      var j = ascii.charCodeAt(i);
+      if (j >> 8) return null;
+      words[i>>2] |= j << ((3-i)%4)*8;
+    }
+    words[words.length] = (asciiBitLength/maxWord)|0;
+    words[words.length] = asciiBitLength;
+    for (var jj = 0; jj < words.length;){
+      var w = words.slice(jj, jj += 16), oldHash = hash;
+      hash = hash.slice(0,8);
+      for (var i = 0; i < 64; i++){
+        var w15 = w[i-15], w2 = w[i-2], a = hash[0], e = hash[4];
+        var t1 = hash[7] + (rr(e,6)^rr(e,11)^rr(e,25)) + ((e&hash[5])^(~e&hash[6])) + k[i] +
+          (w[i] = (i<16) ? w[i] : (w[i-16] + (rr(w15,7)^rr(w15,18)^(w15>>>3)) + w[i-7] + (rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);
+        var t2 = (rr(a,2)^rr(a,13)^rr(a,22)) + ((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+        hash = [(t1+t2)|0].concat(hash);
+        hash[4] = (hash[4]+t1)|0;
+      }
+      for (var i = 0; i < 8; i++){ hash[i] = (hash[i]+oldHash[i])|0; }
+    }
+    for (var i = 0; i < 8; i++){
+      for (var j = 3; j+1; j--){
+        var b = (hash[i]>>(j*8))&255;
+        result += ((b<16)?0:"") + b.toString(16);
+      }
+    }
+    return result;
   }
+  function hashPassword(str){ return sha256Hex(utf8Bytes(str)); }
 
-  var secure = window.crypto && crypto.subtle;
-  if (C.gateHash && !secure){
-    console.warn("보안 컨텍스트가 아니라 암호 확인을 건너뜁니다 (https 배포 시 정상 동작).");
-    unlockApp();
-  } else if (C.gateHash && localStorage.getItem("purin-gate-ok") !== C.gateHash){
+  if (C.gateHash && localStorage.getItem("purin-gate-ok") !== C.gateHash){
     document.getElementById("gate").hidden = false;
     var gi = document.getElementById("gateInput"),
         gb = document.getElementById("gateBtn"),
         ge = document.getElementById("gateErr");
     var tryGate = function(){
-      var val = gi.value.trim().normalize("NFC");
-      sha256(val).then(function(h){
-        if (h === C.gateHash){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
-        else { ge.textContent = "암호가 달라요 (길이 " + val.length + " · " + h.slice(0,8) + ")"; gi.focus(); }
-      });
+      var raw = gi.value, val = raw.trim();
+      if (val.normalize) val = val.normalize("NFC");
+      var h;
+      try { h = hashPassword(val); }
+      catch(err){ ge.textContent = "오류: " + err.message; return; }
+      if (h === C.gateHash){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
+      else { ge.textContent = "암호가 달라요 (길이 " + val.length + " · " + (h ? h.slice(0,8) : "??") + ")"; gi.focus(); }
     };
     gb.onclick = tryGate;
     gi.addEventListener("keydown", function(e){ if (e.key === "Enter") tryGate(); });
