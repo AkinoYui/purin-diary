@@ -37,7 +37,6 @@
   function initCloud(){
     try {
       firebase.initializeApp(FC);
-      firebase.auth().signInAnonymously().catch(function(e){ console.warn("auth 실패", e); });
       notesCol = firebase.firestore().collection("notes");
       notesCol.orderBy("ts", "desc").onSnapshot(function(snap){
         state.notes = [];
@@ -425,27 +424,14 @@
     var gi = document.getElementById("gateInput"),
         gb = document.getElementById("gateBtn"),
         ge = document.getElementById("gateErr");
-    var gv = document.getElementById("gateVer");
-    if (gv) gv.textContent = "빌드 6";
-    function calc(){
+    var tryGate = function(){
       var val = gi.value.trim();
       if (val.normalize) val = val.normalize("NFC");
-      var h;
-      try { h = hashPassword(val) || ""; } catch(err){ h = "ERR:" + err.message; }
-      return { val: val, h: h, ok: h === C.gateHash };
-    }
-    var diag = function(){
-      var r = calc();
-      if (!r.val){ ge.textContent = ""; return; }
-      ge.textContent = "입력 " + r.val.length + "자 · " + r.h.slice(0,8) + (r.ok ? " · 일치 ✓" : " · 불일치");
-    };
-    var tryGate = function(){
-      var r = calc();
-      if (r.ok){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
-      else { ge.textContent = "암호가 달라요 (입력 " + r.val.length + "자 · " + r.h.slice(0,8) + ")"; gi.focus(); }
+      var h; try { h = hashPassword(val); } catch(err){ h = null; }
+      if (h === C.gateHash){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
+      else { ge.textContent = "암호가 달라요. 다시 확인해 주세요."; gi.focus(); }
     };
     gb.onclick = tryGate;
-    gi.addEventListener("input", diag);
     gi.addEventListener("keydown", function(e){ if (e.key === "Enter") tryGate(); });
     var gs = document.getElementById("gateShow");
     if (gs) gs.addEventListener("change", function(){ gi.type = gs.checked ? "text" : "password"; });
