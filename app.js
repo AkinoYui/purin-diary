@@ -426,7 +426,7 @@
         gb = document.getElementById("gateBtn"),
         ge = document.getElementById("gateErr");
     var gv = document.getElementById("gateVer");
-    if (gv) gv.textContent = "빌드 5";
+    if (gv) gv.textContent = "빌드 6";
     function calc(){
       var val = gi.value.trim();
       if (val.normalize) val = val.normalize("NFC");

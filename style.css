@@ -4,6 +4,7 @@
   --text:#e7ecff; --muted:#9fb0e0; --line:#26314f;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+[hidden]{display:none !important;}
 html,body{margin:0; padding:0;}
 body{
   background:var(--bg); color:var(--text);
