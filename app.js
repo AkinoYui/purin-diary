@@ -390,9 +390,10 @@
         gb = document.getElementById("gateBtn"),
         ge = document.getElementById("gateErr");
     var tryGate = function(){
-      sha256(gi.value.normalize("NFC")).then(function(h){
+      var val = gi.value.trim().normalize("NFC");
+      sha256(val).then(function(h){
         if (h === C.gateHash){ localStorage.setItem("purin-gate-ok", C.gateHash); unlockApp(); }
-        else { ge.textContent = "암호가 달라요. 다시 확인해 주세요."; gi.value = ""; gi.focus(); }
+        else { ge.textContent = "암호가 달라요 (길이 " + val.length + " · " + h.slice(0,8) + ")"; gi.focus(); }
       });
     };
     gb.onclick = tryGate;
