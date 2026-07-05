@@ -1,17 +1,15 @@
 // ─────────────────────────────────────────────────────────────
-//  Firebase 설정 (엄마·아빠 메시지를 서로 다른 기기에서 공유하려면 필요)
+//  Firebase 설정 (엄마·아빠 메시지를 서로 다른 기기에서 공유)
 //
-//  ▸ 아래 값을 비워두면(apiKey 빈 문자열) 자동으로
-//    "이 기기에만 저장" 모드로 동작합니다. (설정 전에도 페이지는 잘 열려요.)
-//
-//  ▸ 공유 기능을 켜려면 README의 "Firebase 연결하기" 순서대로
-//    본인 프로젝트 값을 붙여넣으세요.
+//  ▸ apiKey 등은 비밀번호가 아니라 공개되어도 되는 식별자입니다.
+//  ▸ 값을 모두 비우면 자동으로 "이 기기에만 저장" 모드로 돌아갑니다.
 // ─────────────────────────────────────────────────────────────
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyAY9suk2yhTT05G4qWm3LGtlx0gLKaS8aY",
+  authDomain: "nuo-purin-diary.firebaseapp.com",
+  projectId: "nuo-purin-diary",
+  storageBucket: "nuo-purin-diary.firebasestorage.app",
+  messagingSenderId: "237386938240",
+  appId: "1:237386938240:web:9c1d116ee432d1cfacb365",
+  measurementId: "G-MBQXP3XFWE",
 };
