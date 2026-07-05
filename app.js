@@ -397,6 +397,8 @@
     };
     gb.onclick = tryGate;
     gi.addEventListener("keydown", function(e){ if (e.key === "Enter") tryGate(); });
+    var gs = document.getElementById("gateShow");
+    if (gs) gs.addEventListener("change", function(){ gi.type = gs.checked ? "text" : "password"; });
     gi.focus();
   } else {
     unlockApp();
