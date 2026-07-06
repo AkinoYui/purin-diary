@@ -119,20 +119,7 @@
   }
 
   function renderScene(){
-    var sw = document.getElementById("stars"), html = "";
-    var pos = [[16,24],[30,70],[20,130],[44,200],[14,250],[58,40],[70,300],[36,180],[26,330]];
-    for (var i=0;i<pos.length;i++){
-      var sz = (i%3===0)?3:2;
-      html += '<span style="top:'+pos[i][0]+'px;left:'+pos[i][1]+'px;width:'+sz+'px;height:'+sz+'px;animation-delay:'+(i*0.3)+'s"></span>';
-    }
-    sw.innerHTML = html;
-
-    var reached37 = diffDays(milestoneDate(37), today()) >= 0;
-    var babyHtml = reached37 ? purin(52) : puupurin(babyScale());
-    document.getElementById("chars").innerHTML =
-      '<span class="float">'+nuoh()+'</span>' +
-      '<span class="float b" style="margin-bottom:6px">'+babyHtml+'</span>' +
-      '<span class="float c">'+purin(80)+'</span>';
+    // 상단 씬은 이제 정적 영상(puupurin.mp4)으로 대체됨 — 별/캐릭터 렌더링 없음
   }
 
   function renderHome(){
