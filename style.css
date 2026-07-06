@@ -47,10 +47,10 @@ body{
 @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
 
 /* 상단 씬 (가족 영상) */
-.scene{position:relative; height:280px; background:#dde2ec;
+.scene{position:relative; height:300px; background:#dde2ec;
   border-radius:20px; overflow:hidden; display:flex; align-items:center; justify-content:center;}
-/* object-fit:contain = 영상 전체가 잘리지 않게 보임. 꽉 채우려면 cover 로 바꾸세요. */
-.family{width:100%; height:100%; object-fit:contain; display:block; background:#dde2ec;}
+/* cover = 프레임을 꽉 채움(세로로 긴 영상의 위아래 여백 제거). 위치는 object-position 으로 조정. */
+.family{width:100%; height:100%; object-fit:cover; object-position:center 30%; display:block; background:#dde2ec;}
 .hero{text-align:center; margin-top:12px;}
 .hero-ga{font-family:"Jua",sans-serif; font-size:30px; color:#fff; line-height:1.1;}
 .hero-sub{font-size:12px; color:var(--muted); margin-top:3px;}
